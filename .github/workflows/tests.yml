@@ -16,6 +16,15 @@ jobs:
         experimental:
           - false
         php:
+          - "5.3"
+          - "5.4"
+          - "5.5"
+          - "5.6"
+          - "7.0"
+          - "7.1"
+          - "7.2"
+          - "7.3"
+          - "7.4"
           - "8.0"
           - "8.1"
         # https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#example-including-additional-values-into-combinations
@@ -116,24 +125,24 @@ jobs:
           # https://github.com/shivammathur/setup-php/issues/407#issuecomment-773675741
           fail-fast: true
 
-      - name: Debug PHP a bit
+      - name: Remove duplicate ini file for memcache (PHP 8.2)
         run: |
-          find /etc/php/8.2 -type f -name "*.ini" -print0 | xargs -0 grep "memcache.so"
-          sudo rm /etc/php/8.2/mods-available/memcache.ini
+          if [ "${{ matrix.php }}" = "8.2" ] && [ -f /etc/php/8.2/mods-available/memcache.ini ]; then
+            sudo rm /etc/php/8.2/mods-available/memcache.ini
+          fi
           php -i | grep "memcache support" -A 5
-          php -i | grep ".ini"
 
       # https://github.com/zf1s/zf1/pull/6#issuecomment-495397170
-#      - name: Validate composer.json for all packages
-#        run: |
-#          for json in composer.json packages/*/composer.json; do echo COMPOSER=$json; done | parallel env {} composer validate
+      - name: Validate composer.json for all packages
+        run: |
+          for json in composer.json packages/*/composer.json; do echo COMPOSER=$json; done | parallel env {} composer validate
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest
 
-#      - name: Lint PHP source files
-#        run: |
-#          composer lint.checkstyle | cs2pr
+      - name: Lint PHP source files
+        run: |
+          composer lint.checkstyle | cs2pr
 
       - name: Setup environment for PHPUnit
         run: |
