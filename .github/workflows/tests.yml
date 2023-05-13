@@ -118,9 +118,9 @@ jobs:
 
       - name: Debug PHP a bit
         run: |
+          rm /etc/php/8.2/cli/conf.d/20-memcache.ini
           php -i | grep "memcache support" -A 5
           php -i | grep ".ini"
-          cat /etc/php/8.2/cli/conf.d/20-memcache.ini
 
       # https://github.com/zf1s/zf1/pull/6#issuecomment-495397170
 #      - name: Validate composer.json for all packages
