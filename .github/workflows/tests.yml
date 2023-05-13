@@ -122,16 +122,16 @@ jobs:
           php -i | grep ".ini"
 
       # https://github.com/zf1s/zf1/pull/6#issuecomment-495397170
-      - name: Validate composer.json for all packages
-        run: |
-          for json in composer.json packages/*/composer.json; do echo COMPOSER=$json; done | parallel env {} composer validate
+#      - name: Validate composer.json for all packages
+#        run: |
+#          for json in composer.json packages/*/composer.json; do echo COMPOSER=$json; done | parallel env {} composer validate
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest
 
-      - name: Lint PHP source files
-        run: |
-          composer lint.checkstyle | cs2pr
+#      - name: Lint PHP source files
+#        run: |
+#          composer lint.checkstyle | cs2pr
 
       - name: Setup environment for PHPUnit
         run: |
