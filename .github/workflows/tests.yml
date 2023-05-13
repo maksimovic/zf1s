@@ -119,6 +119,7 @@ jobs:
       - name: Debug PHP a bit
         run: |
           find /etc/php/8.2 -type f -name "*.ini" -print0 | xargs -0 grep "memcache.so"
+          rm /etc/php/8.2/mods-available/memcache.ini
           php -i | grep "memcache support" -A 5
           php -i | grep ".ini"
 
