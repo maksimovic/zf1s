@@ -423,6 +423,8 @@ class Zend_Filter_Encrypt_Openssl implements Zend_Filter_Encrypt_Interface
             }
 
             $encrypted = $header . $iv . $encrypted;
+        } else {
+            $encrypted = $iv . $encrypted;
         }
 
         return $encrypted;
@@ -491,7 +493,19 @@ class Zend_Filter_Encrypt_Openssl implements Zend_Filter_Encrypt_Interface
             }
         } else {
             $cipher = $this->_getCipher();
-            $iv = $this->_iv;
+            $ivLength = openssl_cipher_iv_length($cipher);
+            if ($ivLength > 0 && strlen($value) > $ivLength) {
+                $iv = substr($value, 0, $ivLength);
+                $value = substr($value, $ivLength);
+            } else {
+                $iv = '';
+            }
+        }
+
+        // ensure IV has the correct length for the cipher
+        $ivLength = openssl_cipher_iv_length($cipher);
+        if ($ivLength > 0 && strlen($iv) !== $ivLength) {
+            $iv = str_repeat("\0", $ivLength);
         }
 
         if (PHP_VERSION_ID >= 70000) {
