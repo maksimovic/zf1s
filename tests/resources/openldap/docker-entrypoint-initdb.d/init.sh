@@ -43,6 +43,7 @@ ldapadd -v -x \
   -f ${LDIFS}/example.com.ldif || true
 
 files=(
+  "admin.example.com.ldif"
   "manager.example.com.ldif"
   "test.example.com.ldif"
   "user1.example.com.ldif"
