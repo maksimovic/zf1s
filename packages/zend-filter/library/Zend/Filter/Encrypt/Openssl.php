@@ -529,6 +529,12 @@ class Zend_Filter_Encrypt_Openssl implements Zend_Filter_Encrypt_Interface
             return 'RC4';
         }
 
+        // PHP < 7.0 does not support the IV parameter in openssl_seal/openssl_open,
+        // so we must use a cipher that does not require an IV
+        if (PHP_VERSION_ID < 70000) {
+            return 'AES-128-ECB';
+        }
+
         return 'AES-128-CBC';
     }
 
