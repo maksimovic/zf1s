@@ -127,7 +127,7 @@ class Zend_Ldap_Node_SchemaTest extends Zend_Ldap_OnlineTestCase
         $this->assertEquals('2.5.6.5', $ou->getOid());
         $this->assertEquals(array('objectClass', 'ou'), $ou->getMustContain());
         $this->assertEquals(array('businessCategory', 'description', 'destinationIndicator',
-            'facsimileTelephoneNumber', 'internationaliSDNNumber', 'l',
+            'facsimileTelephoneNumber', 'internationalISDNNumber', 'l',
             'physicalDeliveryOfficeName', 'postOfficeBox', 'postalAddress', 'postalCode',
             'preferredDeliveryMethod', 'registeredAddress', 'searchGuide', 'seeAlso', 'st',
             'street', 'telephoneNumber', 'teletexTerminalIdentifier', 'telexNumber',
