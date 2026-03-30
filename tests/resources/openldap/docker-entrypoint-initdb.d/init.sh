@@ -35,11 +35,12 @@ ldapmodify -v -x \
 
 echo "Loading LDIFs fixtures..."
 
+# base entry may already exist (e.g. osixia/openldap creates it from LDAP_DOMAIN)
 ldapadd -v -x \
   -D "cn=${LDAP_ADMIN_USERNAME},${LDAP_ROOT}" \
   -w "${LDAP_ADMIN_PASSWORD}" \
   -H "ldap://127.0.0.1:${LDAP_PORT_NUMBER}" \
-  -f ${LDIFS}/example.com.ldif
+  -f ${LDIFS}/example.com.ldif || true
 
 files=(
   "manager.example.com.ldif"
