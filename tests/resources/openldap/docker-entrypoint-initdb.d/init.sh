@@ -35,15 +35,13 @@ ldapmodify -v -x \
 
 echo "Loading LDIFs fixtures..."
 
-# base entry may already exist depending on the LDAP image used
 ldapadd -v -x \
   -D "cn=${LDAP_ADMIN_USERNAME},${LDAP_ROOT}" \
   -w "${LDAP_ADMIN_PASSWORD}" \
   -H "ldap://127.0.0.1:${LDAP_PORT_NUMBER}" \
-  -f ${LDIFS}/example.com.ldif || true
+  -f ${LDIFS}/example.com.ldif
 
 files=(
-  "admin.example.com.ldif"
   "manager.example.com.ldif"
   "test.example.com.ldif"
   "user1.example.com.ldif"

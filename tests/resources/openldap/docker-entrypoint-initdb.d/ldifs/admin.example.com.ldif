@@ -1,5 +1,0 @@
-dn: uid=admin,dc=example,dc=com
-objectClass: account
-objectClass: simpleSecurityObject
-uid: admin
-userPassword: insecure
