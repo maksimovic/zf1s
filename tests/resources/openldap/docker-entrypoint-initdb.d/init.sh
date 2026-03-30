@@ -35,7 +35,7 @@ ldapmodify -v -x \
 
 echo "Loading LDIFs fixtures..."
 
-# base entry may already exist (e.g. osixia/openldap creates it from LDAP_DOMAIN)
+# base entry may already exist depending on the LDAP image used
 ldapadd -v -x \
   -D "cn=${LDAP_ADMIN_USERNAME},${LDAP_ROOT}" \
   -w "${LDAP_ADMIN_PASSWORD}" \
