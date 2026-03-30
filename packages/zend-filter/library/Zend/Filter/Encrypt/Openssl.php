@@ -70,6 +70,13 @@ class Zend_Filter_Encrypt_Openssl implements Zend_Filter_Encrypt_Interface
     protected $_package = false;
 
     /**
+     * Initialization vector from last encryption
+     *
+     * @var string
+     */
+    protected $_iv = '';
+
+    /**
      * Class constructor
      * Available options
      *   'public'      => public key
@@ -386,7 +393,15 @@ class Zend_Filter_Encrypt_Openssl implements Zend_Filter_Encrypt_Interface
             $value    = $compress->filter($value);
         }
 
-        $crypt  = openssl_seal($value, $encrypted, $encryptedkeys, $keys, 'RC4');
+        $cipher = $this->_getCipher();
+        $iv = '';
+        if (PHP_VERSION_ID >= 70000) {
+            $crypt = openssl_seal($value, $encrypted, $encryptedkeys, $keys, $cipher, $iv);
+        } else {
+            $crypt = openssl_seal($value, $encrypted, $encryptedkeys, $keys, $cipher);
+        }
+        $this->_iv = $iv;
+
         if (PHP_VERSION_ID < 80000) {
             foreach ($keys as $key) {
                 openssl_free_key($key);
@@ -407,7 +422,7 @@ class Zend_Filter_Encrypt_Openssl implements Zend_Filter_Encrypt_Interface
                 $header .= pack('H32n', $fingerprints[$key], strlen($envKey)) . $envKey;
             }
 
-            $encrypted = $header . $encrypted;
+            $encrypted = $header . $iv . $encrypted;
         }
 
         return $encrypted;
@@ -464,9 +479,26 @@ class Zend_Filter_Encrypt_Openssl implements Zend_Filter_Encrypt_Interface
 
             // remainder of string is the value to decrypt
             $value = substr($value, $length);
+
+            // extract IV for ciphers that require it
+            $cipher = $this->_getCipher();
+            $ivLength = openssl_cipher_iv_length($cipher);
+            if ($ivLength > 0) {
+                $iv = substr($value, 0, $ivLength);
+                $value = substr($value, $ivLength);
+            } else {
+                $iv = '';
+            }
+        } else {
+            $cipher = $this->_getCipher();
+            $iv = $this->_iv;
         }
 
-        $crypt  = openssl_open($value, $decrypted, $envelope, $keys, 'RC4');
+        if (PHP_VERSION_ID >= 70000) {
+            $crypt = openssl_open($value, $decrypted, $envelope, $keys, $cipher, $iv);
+        } else {
+            $crypt = openssl_open($value, $decrypted, $envelope, $keys, $cipher);
+        }
         if (PHP_VERSION_ID < 80000) {
             openssl_free_key($keys);
         }
@@ -484,6 +516,20 @@ class Zend_Filter_Encrypt_Openssl implements Zend_Filter_Encrypt_Interface
         }
 
         return $decrypted;
+    }
+
+    /**
+     * Returns the cipher to use for seal/open operations
+     *
+     * @return string
+     */
+    protected function _getCipher()
+    {
+        if (in_array('RC4', openssl_get_cipher_methods(true))) {
+            return 'RC4';
+        }
+
+        return 'AES-128-CBC';
     }
 
     /**
